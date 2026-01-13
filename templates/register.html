@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>register user</title>
+</head>
+<body>
+    <div class="form">
+        <form action="{% url 'create-user' %}" method="post">
+        {%csrf_token%}
+            <div class="form-control">
+                <label for="first name">
+                    First Name
+                 </label>
+            <input type="text" name="first_name">
+            </div>
+             <div class="form-control">
+                <label for="Last name">
+                    Last Name
+                 </label>
+            <input type="text" name="last_name">
+            </div>
+
+             <div class="form-control">
+                <label for="username">
+                    Username
+                 </label>
+            <input type="text" name="username">
+            </div>
+        
+
+             <div class="form-control">
+                <label for="Email">
+                    Email
+                 </label>
+            <input type="email" name="email">
+            </div>
+              <div class="form-control">
+                <label for="Role">
+                    Role
+                 </label>
+            <select name="role" id="role">
+                <option value="DOCTOR">DOCTOR</option>
+                <option value="PATIENT">PATIENT</option>
+                <option value="ADMIN">ADMIN</option>
+            </select>
+            </div>
+            <div class="form-control">
+                <label for="password">
+                    Password
+                 </label>
+            <input type="password" name="password">
+            </div>
+
+             <div class="form-control">
+                <label for="">
+
+                 </label>
+            <button type="submit" >Submit</button>
+            </div>
+
+        </form>
+                <a href="{% url 'login' %}">Sign In</a>
+
+    </div>
+</body>
+</html>
