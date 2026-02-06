@@ -49,7 +49,7 @@ class Appointment(models.Model):
     doctor_id = models.ForeignKey(Doctor,on_delete=models.CASCADE)
     status = models.CharField(max_length=20,choices = AppointmentStatus.choices,default = AppointmentStatus.PENDING)
     reason = models.CharField(max_length = 400,null=False)
-    date_ = models.DateTimeField()
+    date = models.DateTimeField()
 
     def __str__(self):
         return f"Patient {self.patient_id.username} has apointment with doctor {self.doctor_id.user_id.username}"
