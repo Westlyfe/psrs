@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from hospital.serializer import UsersSerializer,InquirySerializer
+from hospital.serializer import UsersSerializer,InquirySerializer,DoctorSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -68,4 +68,31 @@ def create_inquiries(request):
         )
     return Response(
         serializer.errors,status = status.HTTP_400_BAD_REQUEST
+    )
+
+@api_view(['POST'])
+@permission_classes([IsAdmin])
+def create_doctor(request):
+    serializer = DoctorSerializer(data = request.data)
+    if serializer.is_valid():
+        doctor = serializer.save()
+        return Response(
+            {
+                "message":"Doctor created successfully",
+                "data":DoctorSerializer(doctor).data
+            },
+            status = status.HTTP_201_CREATED
+        )
+    return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAdmin,IsDoctor])
+def doctor_availability(request):
+    doctor = Doctor.objects.all()
+    return Response(
+        {
+            "data":DoctorSeriliazer(doctor).data
+        },
+        status = status.HTTP_200_OK
+
     )

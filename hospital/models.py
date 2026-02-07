@@ -39,9 +39,10 @@ class Doctor(models.Model):
     user_id = models.ForeignKey(Users,on_delete = models.CASCADE)
     speicilization = models.CharField(max_length = 30,blank=False)
     availability = models.JSONField(default=dict, blank=True)
+    created_date = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Doctoer {self.name} has specialized in {self.speicilization}"
+        return f"Docter {self.name} has specialized in {self.speicilization}"
 
 
 class Appointment(models.Model):

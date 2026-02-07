@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from hospital.models import Users,Inquries
+from hospital.models import Users,Inquries,Doctor
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,3 +55,29 @@ class InquirySerializer(serializers.ModelSerializer):
         )
         
         return inquries
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+    
+    def validate(self,attrs):
+        user_id = attrs['user_id']
+        if Doctor.objects.filter(user_id = user_id).exists():
+            return serializers.ValidationError('Doctor already exists')
+        
+        if  Users.objects.filter(id = user_id).first() is None:
+            return serializers.ValidationError('User does not exists')
+        
+
+        return attrs
+    
+    def create(self,validated_data):
+        doctor = Doctor.objects.create(
+            name = validated_data['name'],
+            user_id = validated_data['user_id'],
+            availability = validated_data['availability'],
+            specialization = validated_data['specialization']
+        )
+
+        return doctor
