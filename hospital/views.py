@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from hospital.serializer import UsersSerializer
+from hospital.serializer import UsersSerializer,InquirySerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -52,4 +52,20 @@ def login(request):
             "Details":"Incorrect username or password"
         },
         status = status.HTTP_400_BAD_REQUEST
+    )
+
+@api_view(['POST'])
+def create_inquiries(request):
+    serializer = InquirySerializer(data = request.data)
+    if serializer.is_valid():
+        inquiry = serializer.save()
+        return Response(
+            {
+                "message":"Inquiry created successfully",
+                "data":InquirySerializer(inquiry).data
+            },
+            status = status.HTTP_201_CREATED
+        )
+    return Response(
+        serializer.errors,status = status.HTTP_400_BAD_REQUEST
     )

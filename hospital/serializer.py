@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from hospital.models import Users
+from hospital.models import Users,Inquries
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +31,27 @@ class UsersSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class InquirySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inquries
+        fields = '__all__' 
+    
+
+    def validate(self,attrs):
+        inquiry_details = attrs['inquiries_details']
+        if len(inquiry_details)<50:# for learning purpose
+            return serializers.ValidationError('Inquiries details should be atleast 50 characters')
+
+        return attrs
+    
+    def create(self,validated_data):
+        inquries = Inquries.objects.create(
+            patient_name = validated_data['patient_name'],
+            location = validated_data['location'],
+            inquiries_details = validated_data['inquiries_details'],
+            status = validated_data['status']
+        )
+        
+        return inquries
