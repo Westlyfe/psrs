@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from hospital.models import Users,Inquries,Doctor
+from hospital.models import Users,Inquries,Doctor,Schedule,Appointment
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,3 +81,36 @@ class DoctorSerializer(serializers.ModelSerializer):
         )
 
         return doctor
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'
+
+    def validate(self, attrs):
+        doctor = attrs['doctor_id']
+        date = attrs['date'].isoformat()
+
+        slot = Schedule.objects.filter(
+            doctor=doctor,
+            time_slot=date,
+            availability=True
+        ).first()
+
+        if not slot:
+            raise serializers.ValidationError(
+                "Doctor is not available at this time"
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        appointment = Appointment.objects.create(**validated_data)
+
+        # Lock the slot
+        Schedule.objects.filter(
+            doctor=validated_data['doctor_id'],
+            time_slot=validated_data['date'].isoformat()
+        ).update(availability=False)
+
+        return appointment

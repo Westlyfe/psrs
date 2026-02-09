@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view,permission_classes
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from hospital.permission import IsAdmin,IsDoctor,IsPatient
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 @api_view(['POST'])
@@ -95,4 +96,21 @@ def doctor_availability(request):
         },
         status = status.HTTP_200_OK
 
+    )
+
+@api_view(['DELETE'])
+def cancel_appointment(request, id):
+    appointment = get_object_or_404(Appointment, id=id)
+
+    appointment.status = "CANCELLED"
+    appointment.save()
+
+    Schedule.objects.filter(
+        doctor_id=appointment.doctor_id,
+        time_slot=appointment.date.isoformat()
+    ).update(availability=True)
+
+    return Response(
+        {"message": "Appointment cancelled successfully"},
+        status=status.HTTP_200_OK
     )
