@@ -150,4 +150,3 @@ class DoctorScheduleSerializer(serializers.ModelSerializer):
             availability=validated_data.get('availability', True)
         )
         return schedule
-
