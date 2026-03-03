@@ -11,7 +11,7 @@ from hospital.models import Schedule
 # Create your views here.
 
 @api_view(['POST'])
-@permission_classes([IsDoctor])
+@permission_classes([IsAdmin])
 def create_user(request):
     serializer = UsersSerializer(data = request.data)
     if serializer.is_valid():
