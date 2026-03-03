@@ -57,7 +57,7 @@ class Appointment(models.Model):
 
 class Schedule(models.Model):
     doctor_id = models.ForeignKey(Doctor,on_delete = models.CASCADE)
-    time_slot = models.CharField(max_length = 30)
+    time_slot = models.DateTimeField(max_length = 30)
     availability = models.BooleanField(default = True)
 
     # Remember doctor table provided has no relation with users table so thats the tricky sice user has role Doctor we have to make sure that Doctor can login to the system as Admin and Patient so i introduced the relationship

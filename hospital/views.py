@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from hospital.serializer import UsersSerializer,InquirySerializer,DoctorSerializer
+from hospital.serializer import UsersSerializer,InquirySerializer,DoctorSerializer,DoctorScheduleSerializer,AppointmentSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from hospital.permission import IsAdmin,IsDoctor,IsPatient
 from django.shortcuts import get_object_or_404
+from hospital.models import Schedule
 # Create your views here.
 
 @api_view(['POST'])
@@ -98,7 +99,26 @@ def doctor_availability(request):
 
     )
 
+@api_view(['POST'])
+@permission_classes([IsDoctor,IsAdmin])
+def create_appointment(request):
+    serializer = AppointmentSerializer(data = request.data)
+    if serializer.is_valid():
+        appointment  = serializer.save()
+        return Response(
+            {
+                "message":"success",
+                "data":AppointmentSerializer(appointment).data
+            },
+            status = status.HTTP_201_CREATED
+        )
+    return Response(
+        serializer.errors,
+        status = status.HTTP_400_BAD_REQUEST
+    )
+
 @api_view(['DELETE'])
+@permission_classes([IsAdmin,IsDoctor])
 def cancel_appointment(request, id):
     appointment = get_object_or_404(Appointment, id=id)
 
@@ -112,5 +132,47 @@ def cancel_appointment(request, id):
 
     return Response(
         {"message": "Appointment cancelled successfully"},
+        status=status.HTTP_200_OK
+    )
+
+
+
+@api_view(['POST'])
+@permission_classes([IsDoctor, IsAdmin])
+def create_schedule(request):
+
+    serializer = DoctorScheduleSerializer(data=request.data)
+
+    if serializer.is_valid():
+        schedule = serializer.save()
+
+        return Response(
+            {
+                "message": "Schedule created successfully",
+                "data": DoctorScheduleSerializer(schedule).data
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    return Response(
+        {
+            "message": "Validation failed",
+            "errors": serializer.errors
+        },
+        status=status.HTTP_400_BAD_REQUEST
+    )
+
+@api_view(['GET'])
+@permission_classes([IsDoctor, IsAdmin])
+def get_doctor_schedule(request, id):
+    schedule = get_object_or_404(Schedule, id=id)
+
+    serializer = DoctorScheduleSerializer(schedule)
+
+    return Response(
+        {
+            "message": "success",
+            "data": serializer.data
+        },
         status=status.HTTP_200_OK
     )

@@ -114,3 +114,40 @@ class AppointmentSerializer(serializers.ModelSerializer):
         ).update(availability=False)
 
         return appointment
+
+
+class DoctorScheduleSerializer(serializers.ModelSerializer):
+    doctor_name = serializers.CharField(
+        source = 'docter_id.name'
+    )
+    class Meta:
+        model = Schedule
+        fields = '__all__'
+
+    def validate(self, attrs):
+        doctor = attrs.get('doctor_id')
+        time_slot = attrs.get('time_slot')
+
+        if not parse_datetime(time_slot):
+            raise serializers.ValidationError(
+                {"time_slot": "Invalid datetime format. Use ISO format."}
+            )
+
+        if Schedule.objects.filter(
+            doctor_id=doctor,
+            time_slot=time_slot
+        ).exists():
+            raise serializers.ValidationError(
+                "This time slot already exists for this doctor."
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        schedule = Schedule.objects.create(
+            doctor_id=validated_data['doctor_id'],
+            time_slot=validated_data['time_slot'],
+            availability=validated_data.get('availability', True)
+        )
+        return schedule
+
